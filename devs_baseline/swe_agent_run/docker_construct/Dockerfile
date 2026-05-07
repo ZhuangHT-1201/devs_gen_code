@@ -20,17 +20,8 @@ RUN pip install --no-cache-dir \
     click \
     argcomplete \
     userpath \
-    swe-rex
-
-# === 安装本地 xdevs 包 ===
-
-# 将当前目录下的 xdevs 文件夹复制到镜像里的临时目录
-COPY ./xdevspy /tmp/xdevs_source
-
-# 进入该目录并执行 pip install .
-RUN cd /tmp/xdevs_source && \
-    pip install . && \
-    rm -rf /tmp/xdevs_source
+    swe-rex \
+    xdevs==3.0.0
 
 COPY ./xdevs_usage /data/xdevs_usage
 

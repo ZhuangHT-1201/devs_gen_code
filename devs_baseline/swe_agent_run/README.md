@@ -12,6 +12,14 @@ pip install -r requirements.txt
 cd docker_construct
 docker build -t python-xdevs-simpy .
 ```
+说明：该镜像会在构建时从 PyPI 安装 `xdevs==3.0.0`，需要可访问 PyPI 的网络环境。
+
+如果你需要把 `xdevs.py` 源码下载回本地目录（例如调试或二次开发），可执行：
+```bash
+git clone https://github.com/iscar-ucm/xdevs.py.git docker_construct/xdevspy
+```
+当前 `Dockerfile` 不依赖该目录，以上步骤仅用于源码参考。
+
 3. 把测试脚本里的 conda_env 变量改成这里实际的环境名（上面的例子里是 sweagent）。
 4. 在本文件夹（`devs_baseline/swe_agent_run`）底下复制一份放在最外面的 `.env` 文件。或者从零创建并指定相关环境变量:
 ```bash

@@ -128,6 +128,8 @@ cd devs_baseline/swe_agent_run/docker_construct
 docker build -t python-xdevs-simpy .
 ```
 
+The Docker image installs `xdevs==3.0.0` from PyPI during build (network access required).
+
 Then edit `devs_baseline/swe_agent_run/.env` with your API keys. See `devs_baseline/swe_agent_run/README.md` for details.
 
 ### 2. Run Experiments
@@ -239,3 +241,9 @@ A pre-configured example application is included in `example_app/`:
 ```bash
 python -m example_app.run
 ```
+
+## License and Acknowledgements
+
+- Main project license: see `LICENSE` (Apache-2.0).
+- Project acknowledgements: see `ACKNOWLEDGEMENTS.md`.
+- Third-party license notices: see `THIRD_PARTY_NOTICES.md`.
