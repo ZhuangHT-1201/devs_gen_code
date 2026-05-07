@@ -64,7 +64,7 @@ BENCHMARKS = {
 # ── Target benchmarks for this experiment ──────────────────────────────────
 # Use BENCHMARKS keys.  Change this list to run different subsets.
 TARGET_BENCHMARKS = [
-    "ABP", "SEIRD", "SA", "OTrain", "ComplexSup2",
+    "ABP", "SEIRD", "SA", "OTrain",
     # "barbershop", "oft", "IOBS", 
 ]
 
@@ -74,7 +74,7 @@ EXPERIMENT_LLMS = {
     "gpt_5_2":                  "openrouter/openai/gpt-5.2",
     "glm_4_7":                  "openrouter/z-ai/glm-4.7",
     "qwen3_coder_30b_a3b_instruct": "openrouter/qwen/qwen3-coder-30b-a3b-instruct",
-    # "llama4_17b": "openrouter/meta-llama/llama-4-scout",
+    "llama4_17b": "openrouter/meta-llama/llama-4-scout",
 }
 
 # ── Frameworks for this experiment ──────────────────────────────────────
@@ -82,11 +82,7 @@ EXPERIMENT_LLMS = {
 EXPERIMENT_FRAMEWORKS = [
     "single_simpy",
     "single_xdevs",
-    # "bare_simpy",
-    # "bare_xdevs",
     # "devs_fast_plan",
-    # "devs_fast",
-    # "openhands_xdevs",
 ]
 
 # ── Timeouts ────────────────────────────────────────────────────────────
@@ -108,8 +104,6 @@ EXPERIMENT_FRAMEWORKS = [
 GENERATION_TIMEOUTS = {
     "single_simpy":  300,    # 5 min — single API call
     "single_xdevs":  300,    # 5 min — single API call
-    "bare_simpy":    1800,   # 30 min — opencode agent loop
-    "bare_xdevs":    1800,   # 30 min — opencode agent loop
     "default":       1800,   # fallback
 }
 EVAL_TIMEOUT        = 600    # 10 min — entire eval pipeline
