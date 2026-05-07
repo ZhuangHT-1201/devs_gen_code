@@ -137,6 +137,29 @@ FRAMEWORK_REGISTRY: dict[str, dict] = {
         "desc": "OpenHands fast",
         "conda_env": "openhands", "cwd": "devs_baseline/openhands_run",
     },
+
+    # ═══════════════ Single-shot direct API (litellm call → code) ═══════════
+    "single": {
+        "group": "baseline_single",
+        "script": "devs_baseline/devs_skill/run_opencode_skill.py",
+        "extra_cfg": {"mode": "single", "fw": "auto"},
+        "desc": "Opencode single-shot + skill (auto framework)",
+        "conda_env": "hamlet_env", "cwd": ".",
+    },
+    "single_simpy": {
+        "group": "baseline_single",
+        "script": "devs_baseline/devs_skill/run_single_shot.py",
+        "extra_cfg": {},
+        "desc": "Single-shot direct API → simpy code",
+        "conda_env": "hamlet_env", "cwd": ".",
+    },
+    "single_xdevs": {
+        "group": "baseline_single",
+        "script": "devs_baseline/devs_skill/run_single_shot_xdevs.py",
+        "extra_cfg": {},
+        "desc": "Single-shot direct API → xdevs code",
+        "conda_env": "hamlet_env", "cwd": ".",
+    },
 }
 
 
