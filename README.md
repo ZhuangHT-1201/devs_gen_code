@@ -130,35 +130,6 @@ docker build -t python-xdevs-simpy .
 
 Then edit `devs_baseline/swe_agent_run/.env` with your API keys. See `devs_baseline/swe_agent_run/README.md` for details.
 
-Then edit `devs_baseline/openhands_run/.env` with your API keys. See `devs_baseline/openhands_run/README.md` for details.
-
-#### MetaGPT
-
-```bash
-conda create -n metagpt python=3.10
-conda activate metagpt
-pip install -r devs_baseline/meta_gpt_run/requirements.txt
-```
-
-Then edit `devs_baseline/meta_gpt_run/.env` with your API keys. See `devs_baseline/meta_gpt_run/README.md` for details.
-
-#### SWE-agent
-
-```bash
-conda create -n sweagent python=3.12
-conda activate sweagent
-pip install -r devs_baseline/swe_agent_run/requirements.txt
-```
-
-Build the Docker image:
-
-```bash
-cd devs_baseline/swe_agent_run/docker_construct
-docker build -t python-xdevs-simpy .
-```
-
-Then edit `devs_baseline/swe_agent_run/.env` with your API keys. See `devs_baseline/swe_agent_run/README.md` for details.
-
 ### 2. Run Experiments
 
 Navigate to the tester directory:
