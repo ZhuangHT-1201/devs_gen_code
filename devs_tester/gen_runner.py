@@ -105,12 +105,6 @@ FRAMEWORK_REGISTRY: dict[str, dict] = {
         "desc": "DEVS fast plan-then-construct",
         "conda_env": "hamlet_env", "cwd": ".",
     },
-    "devs_fast_plan": {
-        "group": "devs_native", "mode": "generate",
-        "args": ["--concur_num", "4"],
-        "desc": "DEVS fast plan-then-construct",
-        "conda_env": "hamlet_env", "cwd": ".",
-    },
 
     # ═══════════════ External runners (own conda env + subdir) ═══════════════
     "meta_gpt": {
@@ -129,6 +123,18 @@ FRAMEWORK_REGISTRY: dict[str, dict] = {
         "group": "baseline_runner",
         "script": "devs_baseline/openhands_run/run_openhands.py",
         "desc": "OpenHands standard",
+        "conda_env": "openhands", "cwd": "devs_baseline/openhands_run",
+    },
+    "swe_agent_fast": {
+        "group": "baseline_runner",
+        "script": "devs_baseline/swe_agent_run/run_swe_agent_fast.py",
+        "desc": "SWE-Agent fast",
+        "conda_env": "sweagent", "cwd": "devs_baseline/swe_agent_run",
+    },
+    "openhands_fast": {
+        "group": "baseline_runner",
+        "script": "devs_baseline/openhands_run/run_openhands_fast.py",
+        "desc": "OpenHands fast",
         "conda_env": "openhands", "cwd": "devs_baseline/openhands_run",
     },
 }
