@@ -157,35 +157,22 @@ You must construct the script in the following **exact order**.
 ### 1. Imports
 - **General**: Import `Coordinator`, `SimulationClock` from `xdevs.sim`.
 - **Utils**: Import `set_global_clock` from `devs_project.devs_utils.devs_context`.
-- **Injection (Conditional)**: IF the scenario requires external event injection:
-    - Import `ReliableInjectionSystem` from `devs_project.devs_utils.inject`.
-    - Import `get_raw_input_content` from `devs_project.devs_utils.inject`.
 - **Target Model**: Use a **relative import** for the model class. 
     - Logic: If script is at `runner.py` and model is at `target.py`, use `from .target import {class_name}`.
 
-### 2. Configuration (ArgParse & Input Parsing)
-- **Step 2.1**: Initialize `argparse.ArgumentParser`.
-    - Create arguments for `{class_name}` initialization parameters and `simulate_time` (or other name like `simulation_time` if specified in the scenario). Make sure the parameters do exists in the model specification. 
-    - **CRITICAL**: Set `default` values based on the **Simulation Scenario**.
-    - **CRITICAL**: if the args are specified in the `Simulation Scenario`, ensure their names match exactly.
-    - Parse the arguments into variables (e.g., `args = parser.parse_args()`).
-- **Step 2.2 (Input Parsing)**: IF the Model Specification has input_ports, and **Simulation Scenario** clearly specified them (e.g., "inject X at time T"):
-    - If it Simulation Scenario mentioned to read from file / stdin, call `raw_text = get_raw_input_content()` to safely read Stdin. 
-    - Implement a helper function (e.g., `parse_schedule(text)`) to parse `raw_text` into a list of event dicts `[{{"time":..., "port":..., "payload":...}}]`.
-    - Ensure the parser matches the data format described in the Scenario.
+### 2. Configuration (ArgParse)
+Initialize `argparse.ArgumentParser`: 
+- Create arguments for `{class_name}` initialization parameters and `simulate_time` (or other name like `simulation_time` if specified in the scenario). Make sure the parameters do exists in the model specification. 
+- **CRITICAL**: Set `default` values based on the **Simulation Scenario**.
+- **CRITICAL**: if the args are specified in the `Simulation Scenario`, ensure their names match exactly.
+- Parse the arguments into variables (e.g., `args = parser.parse_args()`).
 
 ### 3. Initialization (The Logic is Strict)
 - **Step 3.1**: Create the clock: `clock = SimulationClock()`.
 - **Step 3.2**: **CRITICAL**: Register the clock globally: `set_global_clock(clock)`.
-- **Step 3.3**: Instantiate the model `{class_name}`.
+- **Step 3.3**: Instantiate the model `{class_name}`: `model = {class_name}(...)`.
     - Ensure you pass the correct arguments (e.g., `name="{class_name}"`, `parent=None`, and other params defined in Step 2).
-- **Step 3.4 (Harness Wrapping)**:
-    - **IF Injection is used**:
-        - Instantiate the harness: `model = ReliableInjectionSystem(name="harness", parent=None, core_model={class_name}_instance, events=parsed_events)`.
-        - Note: The `ReliableInjectionSystem` becomes the top-level model to be simulated.
-    - **ELSE**:
-        - Use the core model directly: `model = {class_name}_instance`.
-- **Step 3.5**: Create the Simulator: `sim = Coordinator(model, clock)`.
+- **Step 3.4**: Create the Simulator: `sim = Coordinator(model, clock)`.
 
 ### 4. Simulation Execution
 - Call `sim.initialize()`.
@@ -267,13 +254,13 @@ class TopSimulationCreatorFast(Tool):
         self.tool_dir = Path(__file__).parent.parent.parent
         sub_path = os.path.join("materials")
         self.example_files = [
-            self.tool_dir / sub_path / "devs_project/runner_example_inject.py"
+            self.tool_dir / sub_path / "devs_project/runner_example.py"
         ]
         self.util_desc_file = self.tool_dir / sub_path / "util_desc.yaml"
         self.injected_utils = [
             "set_global_clock",
-            "injection_tools",
-            "get_raw_input_content",
+            # "injection_tools",
+            # "get_raw_input_content",
             "logger",
             "get_current_time",
         ]

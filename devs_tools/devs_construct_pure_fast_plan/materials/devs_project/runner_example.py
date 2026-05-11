@@ -11,13 +11,13 @@ from .coupled_example import SimpleCoupled
 ### END
 
 if __name__ == "__main__":
-### BEGIN: Parameter Configuration (ArgParse)
+    ### BEGIN: Parameter Configuration (ArgParse)
     parser = argparse.ArgumentParser(description="Run SimpleCoupled simulation")
     
     # Define arguments with defaults suitable for the scenario
     parser.add_argument("--gen1_init_value", type=int, default=0, help="Initial value for generator 1")
     parser.add_argument("--gen2_init_value", type=int, default=10, help="Initial value for generator 2")
-    parser.add_argument("--simulate_time", type=float, default=5000.0, help="Simulation duration")
+    parser.add_argument("--simulate_time", type=float, default=60, help="Simulation duration")
     
     args = parser.parse_args()
     
@@ -25,7 +25,6 @@ if __name__ == "__main__":
     gen1_init_value = args.gen1_init_value
     gen2_init_value = args.gen2_init_value
     simulate_time = args.simulate_time
-    ### END
     
     ### BEGIN: Initialization
     clock = SimulationClock()

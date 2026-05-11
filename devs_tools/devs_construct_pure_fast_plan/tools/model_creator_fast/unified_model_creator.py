@@ -96,6 +96,14 @@ COUPLED_INSTRUCTIONS = """
 3. **Coupling Precedence**: [Context Info] is the SINGLE SOURCE OF TRUTH for sub-model names and port names. If the [Specification] differs, you MUST follow the [Context Info].
 """
 
+MODEL_SKILLS_STDIN = """
+**Standard Input Generator Pattern (CRITICAL)**
+If this atomic model's role is to read simulated events from `stdin`, YOU MUST NOT use `input()` or `while True`. You MUST implement the following lazy-read state machine:
+    - **In `initialize()`**: Set `self.state['iterator'] = iter(sys.stdin)`. Try to read the first line using `line = next(self.state['iterator'], None)`. Parse the `timestamp` and `payload`. Calculate `sigma = timestamp - 0.0`. Store the payload in `self.state['next_event']` and call `self.hold_in("ACTIVE", sigma)`. If no line, `self.passivate()`.
+    - **In `lambdaf()`**: Output `self.state['next_event']` via `self.output["port"].add(...)`.
+    - **In `deltint()`**: Try to read the next line using `line = next(self.state['iterator'], None)`. If EOF, `self.passivate()`. If valid, parse the new `timestamp`, calculate `sigma = timestamp - self.ta() - self.e` (or relative to the current absolute simulation time depending on your tracking), store the new payload, and call `self.hold_in("ACTIVE", sigma)`.
+"""
+
 MAIN_PROMPT_TEMPLATE = """
 ## [Task]
 Construct a complete Python file containing a **{model_type} DEVS model** named `{name}` using `xdevs.py`.
@@ -103,6 +111,8 @@ Construct a complete Python file containing a **{model_type} DEVS model** named 
 {global_standards}
 
 {model_specific_instructions}
+
+{model_skills}
 
 {feedback}
 
@@ -229,6 +239,13 @@ class ModelCreator:
         model_spec = model_plan.model_info.specification.to_llm_json()
         if model_plan.coupling_specification:
             model_spec += f"\n**Coupling Specification (basicly follow these couplings)**:\n{model_plan.coupling_specification}\n"
+            
+        # prepare skills
+        if model_plan.type == "atomic":
+            model_skills = MODEL_SKILLS_STDIN
+        else:
+            model_skills = ""
+            
         prompt = MAIN_PROMPT_TEMPLATE.format(
             model_type=TYPE_TO_CLASS_NAME[model_plan.type],
             name=model_plan.model_info.class_name,
@@ -241,6 +258,7 @@ class ModelCreator:
             util_desc=util_desc,
             context_str=context_str,
             feedback=feedback,
+            model_skills=model_skills,
         )
 
         full_path = self.working_directory / model_plan.model_info.file_path

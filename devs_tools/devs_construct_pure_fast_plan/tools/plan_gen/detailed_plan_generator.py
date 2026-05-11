@@ -58,139 +58,150 @@ def _build_prompt(
     is_root: bool,
     is_coupled: bool,
 ) -> str:
-    """Build the dynamic prompt based on module type."""
+    """Build the dynamic prompt based on module type using structural XML tags."""
 
+    # ==========================================
+    # 1. 基础信息区 (Base Context)
+    # ==========================================
+    base_prompt = f"""
+<SystemRole>
+You are a DEVS System Architect. 
+</SystemRole>
+
+<TargetContext>
+Module Name: {target_name}
+Module Type: {'COUPLED (Has children)' if is_coupled else 'ATOMIC (Leaf node)'}
+Direct Children: {children_names_str if children_names_str else 'None'}
+</TargetContext>
+
+<SystemRequirements>
+{requirements}
+</SystemRequirements>
+
+<GlobalPlanOverview>
+{global_plan_str}
+</GlobalPlanOverview>
+"""
+
+    # ==========================================
+    # 2. 继承关系区 (Inheritance Rules)
+    # ==========================================
     if is_root:
-        context = "Root model, keep the input/output ports minimal."
-        inherent = f"""
-- **model_init_args**: get essential args.
-- **input_ports / output_ports**: keep ports minimal, only contain the required function.
-""".strip()
+        inheritance = """
+<InheritanceRules>
+- This is the ROOT model. Keep the input/output ports minimal.
+- model_init_args: get essential args.
+- input_ports / output_ports: keep ports minimal, only contain the required function.
+</InheritanceRules>
+"""
     else:
-        context = f"""
+        inheritance = f"""
+<InheritanceRules>
 **Model's Simple Plan** (this model's initial interface from parent):
 {parent_simple_str}
 
 **Parent's Detailed Plan** (system context):
 {parent_detail_str}
-""".strip()
-        inherent = f"""
-- **model_init_args**: inherit from Parent's Simple Plan.
-- **input_ports / output_ports**: inherit from Parent's Simple Plan.
-""".strip()
-    
-    if is_coupled:
-        instruction = f"""
-## [Task]
-Generate a detailed specification for the COUPLED module `{target_name}` and simple specifications for its direct children ({children_names_str}).
 
-### STEP 1: Design Coupled Wrapper (`detailed_plan`)
-- **function**: Describe the overall purpose and capability of this entire subsystem as a unified whole. While the coupled wrapper itself only contains structural connections (no active routing/state logic), this field should summarize what the encapsulated subsystem achieves.
-{inherent}
-
-### STEP 2: Design Children (`children_plans`)
-- **function**: 1-2 sentences.
-- **logging**: 1-2 sentences, mention what logging items should be covered in the model.
-- **model_init_args**: full args (name/type/structure); always start with name (str) and parent (Coupled | None); 
-- **input_ports / output_ports**: full port definitions for sibling and parent matching. MUST make sure the structures of ports match strictly, and the name aligned with the coupling_specification.
-Children with children in the global plan -> `coupled`; leaf children -> `atomic`.
-
-### STEP 3: Design coupling_specification:
-- MUST define the network routing here. It's ONLY allowed to use these 3 strict DEVS connection patterns. List them clearly line-by-line:
-    1. **EIC (External Input Coupling)**: Routing external data IN to a child. Format: `parent.IN.port_name -> child.IN.port_name`
-    2. **IC (Internal Coupling)**: Data flowing between siblings. Format: `child_A.OUT.port_name -> child_B.IN.port_name`
-    3. **EOC (External Output Coupling)**: Routing child results OUT to the parent. Format: `child.OUT.port_name -> parent.OUT.port_name`
-- **CRITICAL COUPLING RULES**:
-    1. **NO HALLUCINATIONS**: Every port name you use MUST EXACTLY MATCH either the Parent's inherited ports or the Children's ports you defined in STEP 1. DO NOT invent ports.
-    2. **NOT ALL PORTS NEED PARENT CONNECTIONS**: Children can communicate entirely with each other via IC. Do NOT force an EIC for a child's input if it should be driven by a sibling. Some ports may remain uncoupled.
+- model_init_args: inherit from Parent's Simple Plan.
+- input_ports / output_ports: inherit from Parent's Simple Plan.
+</InheritanceRules>
 """
-        output_format = f"""
-## [Output Format]
-Return ONLY a JSON object with exactly THREE keys: `detailed_plan`, `children_plans`, and `coupling_specification`.
-- `detailed_plan` has the structure: {_RAW_COUPLED_SCHEMA}
-- `children_plans` is a list of: {_RAW_SIMPLE_SCHEMA}
-- `coupling_specification` is a string
+
+    # ==========================================
+    # 3. 核心任务隔离区 (Task Instruction)
+    # ==========================================
+    if is_coupled:
+        instruction = """
+<TaskInstruction>
+Generate a detailed specification for the COUPLED module and simple specifications for its direct children.
+
+[STEP 1: Design Coupled Wrapper (detailed_plan)]
+- function: Describe the overall purpose and capability of this entire subsystem as a unified whole. While the coupled wrapper itself only contains structural connections (no active routing/state logic), this field should summarize what the encapsulated subsystem achieves.
+
+[STEP 2: Design Children (children_plans)]
+- function: 1-2 sentences.
+- logging: 1-2 sentences, mention what logging items should be covered in the model.
+- model_init_args: full args (name/type/structure); always start with name (str) and parent (Coupled | None).
+- input_ports / output_ports: full port definitions for sibling and parent matching. MUST make sure the structures of ports match strictly, and the name aligned with the coupling_specification. Children with children in the global plan -> `coupled`; leaf children -> `atomic`.
+- port protocol: For the ports, you must carefully design the protocol to avoid deadlocks. For example, you must specify which end is responsible for sending the initial signal (for a router-processor pattern, whether the router assume all the processors are ready, or the processors will send an initial "ready" signal to the router).
+
+[STEP 3: Design coupling_specification]
+- MUST define the network routing here. It's ONLY allowed to use these 3 strict DEVS connection patterns. List them clearly line-by-line:
+    1. EIC (External Input Coupling): Routing external data IN to a child. Format: `parent.IN.port_name -> child.IN.port_name`
+    2. IC (Internal Coupling): Data flowing between siblings. Format: `child_A.OUT.port_name -> child_B.IN.port_name`
+    3. EOC (External Output Coupling): Routing child results OUT to the parent. Format: `child.OUT.port_name -> parent.OUT.port_name`
+
+- CRITICAL COUPLING RULES:
+    1. NO HALLUCINATIONS: Every port name you use MUST EXACTLY MATCH either the Parent's inherited ports or the Children's ports you defined in STEP 1. DO NOT invent ports.
+    2. NOT ALL PORTS NEED PARENT CONNECTIONS: Children can communicate entirely with each other via IC. Do NOT force an EIC for a child's input if it should be driven by a sibling. Some ports may remain uncoupled.
+</TaskInstruction>
 """
     else:
-        instruction = f"""
-## [Task]
-Generate a detailed specification for the ATOMIC module `{target_name}`.
+        instruction = """
+<TaskInstruction>
+Generate a detailed specification for the ATOMIC module.
 
-### For the detailed ATOMIC `{target_name}` plan:
-- **function**: pure responsibility, state machine, event handling, timing. Do NOT describe logging here.
-- **logging**: Extract ALL logging/output requirements from the original requirements that apply to this model. Include payload structure, format, and timing.
-- **model_init_args**: copy from Model's Simple Plan.
-- **input_ports / output_ports**: copy from Model's Simple Plan.
-"""
-        output_format = f"""
-## [Output Format]
-Return ONLY a JSON object matching this exact structure:
-{_RAW_ATOMIC_SCHEMA}
+[ATOMIC detailed_plan Design]
+- function: pure responsibility, state machine, event handling, timing. Do NOT describe logging here.
+- logging: Extract ALL logging/output requirements from the original requirements that apply to this model. Include payload structure, format, and timing. Must keep strict consistency with the requirements.
+- model_init_args: copy from Model's Simple Plan.
+- input_ports / output_ports: copy from Model's Simple Plan.
+</TaskInstruction>
 """
 
-    return f"""
-## [Role]
-You are a **DEVS System Architect**. 
-
-## [Input]
-**Target Module**: {target_name}
-**Children in Global Plan**: {children_names_str}
-**Original Requirements**:
-{requirements}
-
-**Global Plan Overview** (full module hierarchy):
-{global_plan_str}
-
-{context}
-
-{instruction.strip()}
-
-## [Field Guidance]
+    # ==========================================
+    # 4. 字段格式指引区 (Field Guidance)
+    # ==========================================
+    guidance = """
+<FieldGuidance>
 - For ANY `model_init_args`, `input_ports`, or `output_ports` that use `dict` or `list` types, you MUST use a strict **Python Dict/List representation** to define the structure.
-- **Strict Format Examples**:
+- Strict Format Examples:
     - BAD (Vague Summary): "Information about the sent packet including sequence number and retry flag."
     - BAD (Vague List): "A list of jobs."
-    - GOOD (Strict Dict): "Packet info. Format: {{'sequence_number': int, 'control_bit': str, 'is_retry': bool}}."
-    - GOOD (Strict List): "List of jobs. Format: [{{'job_id': int, 'priority': float}}]."
-    - GOOD (Nested): "Format: {{'metadata': {{'timestamp': float, 'source': str}}, 'payload': list[int]}}."
+    - GOOD (Strict Dict): "Packet info. Format: {'sequence_number': int, 'control_bit': str, 'is_retry': bool}."
+    - GOOD (Strict List): "List of jobs. Format: [{'job_id': int, 'priority': float}]."
+    - GOOD (Nested): "Format: {'metadata': {'timestamp': float, 'source': str}, 'payload': list[int]}."
 - Types allowed: int, float, bool, str, dict, list. 
 - Port protocol: Must include initial_state (state at T=0), initial_signal (signal at startup), description.
-""".strip() + "\n" + output_format.strip()
+</FieldGuidance>
+"""
+
+    # 组合拼接
+    return (base_prompt + inheritance + instruction + guidance).strip()
 
 # ====== Pydantic raw response models ======
 
 class _RawAtomicDetailed(BaseModel):
-    class_name: str = Field(description="Name of the atomic model class.")
+    class_name: str = Field(description="Name of the atomic model class. Must match target_name exactly.")
     model_type: Literal["atomic"] = Field(description="Must be 'atomic'.")
     function: str = Field(description="Pure responsibility, state machine, event handling, and timing.")
     logging: str = Field(description="ALL logging details — event names, payload keys/types, format, timing.")
-    model_init_args: list[TypedEntity] = Field(default_factory=list)
+    model_init_args: list[TypedEntity] = Field(default_factory=list, description="Essential init args.")
     input_ports: list[PortEntity] = Field(default_factory=list)
     output_ports: list[PortEntity] = Field(default_factory=list)
 
 class _RawCoupledDetailed(BaseModel):
-    class_name: str = Field(description="Name of the coupled model class.")
+    class_name: str = Field(description="Name of the coupled model class. Must match target_name exactly.")
     model_type: Literal["coupled"] = Field(description="Must be 'coupled'.")
-    function: str = Field(description="Overall purpose and capability of this entire subsystem as a whole. No active routing logic inside the coupled wrapper itself.")
+    function: str = Field(description="Overall purpose and capability of the entire subsystem. NO active routing logic inside.")
     model_init_args: list[TypedEntity] = Field(default_factory=list)
     input_ports: list[PortEntity] = Field(default_factory=list)
     output_ports: list[PortEntity] = Field(default_factory=list)
 
 class _RawSimple(BaseModel):
-    class_name: str = Field(description="Name of the model class.")
+    class_name: str = Field(description="Name of the child model class.")
     model_type: Literal["atomic", "coupled"] = Field(description="Children with children -> 'coupled'; leaf -> 'atomic'.")
     function: str = Field(description="1-2 sentences describing responsibility.")
-    logging: str = Field(description="ALL logging details.")
+    logging: str = Field(description="1-2 sentences logging requirements.")
     model_init_args: list[TypedEntity] = Field(default_factory=list)
     input_ports: list[PortEntity] = Field(default_factory=list)
     output_ports: list[PortEntity] = Field(default_factory=list)
 
-# Distinct Response Envelopes
 class _RawCoupledResponse(BaseModel):
-    detailed_plan: _RawCoupledDetailed = Field(description="Detailed specification for the coupled module.")
+    detailed_plan: _RawCoupledDetailed = Field(description="Detailed specification for this coupled wrapper.")
     children_plans: list[_RawSimple] = Field(default_factory=list, description="Simple specifications for direct children.")
-    coupling_specification: str = Field(description="Describe EIC/IC/EOC clearly.")
-
+    coupling_specification: str = Field(description="Describe EIC/IC/EOC line-by-line. e.g., parent.IN.port -> child.IN.port")
 
 class PlanGenResult:
     def __init__(self, detailed_plan: DetailedPlan, children_plans: list[SimpleDetailedPlan]):
@@ -278,8 +289,8 @@ class DetailedPlanGenerator:
         parts = [
             f"class_name: {plan.class_name}",
             f"model_type: {plan.model_type}",
-            f"function: {s.function[:300]}",
-            f"logging: {s.logging[:300]}",
+            f"function: {s.function}",
+            f"logging: {s.logging}",
             f"coupling_specification: {plan.coupling_specification or 'null'}",
         ]
         if s.input_ports:

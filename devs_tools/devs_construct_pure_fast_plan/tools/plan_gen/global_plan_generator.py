@@ -43,6 +43,7 @@ Decompose the system into a hierarchical module structure. Return a list of modu
   - Coupled models have sub-components and routing (couplings) but NO behavior.
   - The input/output ports of a model can only connect to a sibling (IC) or be a proxy of parent model (EIC, EOC).
   - Define the data_flows to establish the exact communication topology between the modules you create.
+10. If the system reads from standard input (`stdin`), explicitly designate exactly ONE atomic module for this task. Multiple modules listening to `stdin` simultaneously will cause read conflicts and must be avoided.
 
 ## [IMPORTANT: KEEP IT SIMPLE]
 - **Minimize the number of modules**: Only create modules that are truly necessary.
