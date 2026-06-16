@@ -12,38 +12,39 @@ from datetime import datetime
 
 import litellm
 
-litellm.register_model(
-    {
-        "openai/qwen3.6-plus": {
-            "litellm_provider": "openai",
-            "mode": "chat",
-            "max_input_tokens": 131072,
-            "max_output_tokens": 131072,
-            "max_tokens": 65536,
-        },
-        "openrouter/deepseek/deepseek-v3.2": {
-            "litellm_provider": "openrouter",
-            "mode": "chat",
-            "max_input_tokens": 123840,
-            "max_output_tokens": 123840,
-            "max_tokens": 123840,
-        },
-        "openrouter/qwen/qwen3-coder": {
-            "litellm_provider": "openrouter",
-            "mode": "chat",
-            "max_input_tokens": 200000,
-            "max_output_tokens": 200000,
-            "max_tokens": 200000,
-        },
-        "openrouter/z-ai/glm-4.7": {
-            "litellm_provider": "openrouter",
-            "mode": "chat",
-            "max_input_tokens": 200000,
-            "max_output_tokens": 128000,
-            "max_tokens": 200000,
-        },
-    }
-)
+_CUSTOM_MODEL_REGISTRY = {
+    "openai/qwen3.6-plus": {
+        "litellm_provider": "openai",
+        "mode": "chat",
+        "max_input_tokens": 131072,
+        "max_output_tokens": 131072,
+        "max_tokens": 65536,
+    },
+    "openrouter/deepseek/deepseek-v3.2": {
+        "litellm_provider": "openrouter",
+        "mode": "chat",
+        "max_input_tokens": 123840,
+        "max_output_tokens": 123840,
+        "max_tokens": 123840,
+    },
+    "openrouter/qwen/qwen3-coder": {
+        "litellm_provider": "openrouter",
+        "mode": "chat",
+        "max_input_tokens": 200000,
+        "max_output_tokens": 200000,
+        "max_tokens": 200000,
+    },
+    "openrouter/z-ai/glm-4.7": {
+        "litellm_provider": "openrouter",
+        "mode": "chat",
+        "max_input_tokens": 200000,
+        "max_output_tokens": 128000,
+        "max_tokens": 200000,
+    },
+}
+
+if hasattr(litellm, "register_model"):
+    litellm.register_model(_CUSTOM_MODEL_REGISTRY)
 
 from default_tools.file_editing.file_editing_tools import (
     ListDir,

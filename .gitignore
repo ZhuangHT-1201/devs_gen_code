@@ -1,0 +1,26 @@
+# Secrets and local env
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+.venv312/
+venv/
+
+# IDE / OS
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# DEVS-GEN runtime artifacts (regenerated locally)
+devs_app/working_dirs/
+devs_app/persistent_storage/
+
+# Large simulation traces (keep eval csv/png only)
+eval_results/**/*.jsonl
+*.jsonl

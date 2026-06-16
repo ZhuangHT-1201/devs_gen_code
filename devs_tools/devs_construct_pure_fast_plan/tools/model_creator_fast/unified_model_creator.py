@@ -55,7 +55,7 @@ def process_sub_models(sub_models: list[StandardContextModel], target_file_path:
 
 GLOBAL_STANDARDS = """
 ## [Global Standards - STRICT]
-1. **Imports**: Whitelist: `numpy`, `math`, `random`, `time`, `pandas`, `xdevs` (and `xdevs.models`). Use `devs_project.devs_utils.xxx` for project utilities.
+1. **Imports**: Whitelist: `numpy`, `math`, `random`, `time`, `pandas`, `json`, `asyncio`, `openai` (via `from openai import AsyncOpenAI`), `xdevs` (and `xdevs.models`). Use `devs_project.devs_utils.xxx` for project utilities.
 2. **Typing**: Use ONLY `int`, `float`, `str`, `bool`, `dict`, and `list` for ports and arguments.
 3. **Strict Consistency**: 
     - Ports MUST exactly match the names and types in the [Specification]. Do NOT add, remove, or rename ports.
@@ -79,6 +79,13 @@ ATOMIC_INSTRUCTIONS = """
 7. **Ports and Init Args**: Register all ports and `__init__` arguments exactly as stated in the Specification. `__init__` must always start with `(self, name: str, parent: Coupled | None, ...)`.
 8. **Execution Sequence (CRITICAL)**: `lambdaf` will send outputs before `deltint` schedules the next internal event. Thus, the payload sent in `lambdaf` should be prepared in the previous `deltint`, `deltext`, or `initialize`. 
 9. **Confluent Events (`deltcon`)**: By default, internal events (`deltint`) take precedence over external events when they occur simultaneously. Explicitly override the `deltcon(self)` method ONLY IF you need to change this logic (e.g., to process external events first).
+10. **LLM Decision Mode (when required by the spec)**:
+    - File header MUST include: `import asyncio` and `from openai import AsyncOpenAI`.
+    - Do NOT use fixed mathematical formulas for behavioral decisions (e.g., work/consumption propensity) if the spec asks for LLM-driven behavior.
+    - Build a prompt string from current agent state variables (e.g., savings, expected wage/income, goods price, interest rate, recent memory variables).
+    - Use async OpenAI call with a dedicated helper coroutine, and invoke it from DEVS transition code via `asyncio.run(...)` (or an equivalent safe bridge from sync method to async call):
+      `await client.chat.completions.create(..., response_format={"type": "json_object"})`.
+    - Parse returned JSON robustly, extract numeric fields (e.g., `work`, `consumption`), cast to float, and assign them to internal state variables with sane fallbacks on errors.
 """
 
 COUPLED_INSTRUCTIONS = """

@@ -15,7 +15,7 @@ from .code_inspector import CodeInspector
 # 这里我们需要包含之前的标准，因为修复代码时也必须遵守这些规范
 GLOBAL_STANDARDS = """
 ### [Global Standards]
-- **Imports**: Whitelist: `numpy`, `math`, `random`, `time`, `pandas`, `xdevs`, `devs_project.devs_utils.*`.
+- **Imports**: Whitelist: `numpy`, `math`, `random`, `time`, `pandas`, `json`, `asyncio`, `xdevs`, `from openai import AsyncOpenAI`, `devs_project.devs_utils.*`.
 - **Coding**: explicit `__init__` args, use `self.logger.info`, store hardcoded params in `self.param`.
 """
 
@@ -55,6 +55,11 @@ ATOMIC_INSTRUCTIONS = """
         - **Execution Sequence (CRITICAL)**: `lambdaf` will send outputs before `deltint` schedules the next internal event. Thus, the payload sent in `lambdaf` should be prepared in the previous `deltint`, `deltext`, or `initialize`. 
         - **Confluent Events (`deltcon(self)`)**: By default, internal events (`deltint`) take precedence over external events when they occur simultaneously. Explicitly override the `deltcon(self)` method ONLY IF you need to change this logic (e.g., to process external events first).
         - **Initialization**: If a signal or information should be sent at initialization(i.e. protocol.initial_signal), you can use `self.hold_in("INIT", 0)` to schedule the event and send it in `lambdaf`. This is the only way to send a signal at initialization.
+    - **LLM Decision Rules (if required by target spec)**:
+        - Keep `import asyncio` and `from openai import AsyncOpenAI` in generated atomic model files.
+        - Build prompts from runtime agent state (e.g., wage, savings, price, tax/redistribution context).
+        - Use async API calls with `response_format={"type": "json_object"}` and parse JSON outputs into float state variables such as `work` and `consumption`.
+        - Avoid formula-only decision code if the specification requires LLM-driven decisions.
 """
 
 COUPLED_INSTRUCTIONS = """

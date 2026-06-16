@@ -74,8 +74,8 @@ from .tools.plan_gen.detailed_plan_generator import DetailedPlanGenerator, PlanG
 
 from .tools.model_creator_fast.model_create_flow import ModelCreateFlow
 from .tools.model_creator_fast.model_summarizer_recur import HierarchySummarizer
-from .tools.model_creator.simulation_based_refine import SimuBasedModelChecker
-from .tools.model_creator.code_simulator import SimulationRunnerFixer
+from .tools.model_creator_fast.simulation_based_refine import SimuBasedModelChecker
+from .tools.model_creator_fast.code_simulator import SimulationRunnerFixer
 
 from .tools.simulation.top_simulation_creator import TopSimulationCreator
 from .tools.simulation.top_simulation_creator_fast import TopSimulationCreatorFast
