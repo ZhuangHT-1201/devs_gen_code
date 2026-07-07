@@ -1,0 +1,17 @@
+root_model_name: IPD_D1
+requirements:
+  general: |
+    Python 3.10+, asyncio, openai.AsyncOpenAI, JSONL stdout traces.
+  scenario: |
+    ### Iterated Prisoner's Dilemma (Akata et al. 2023, arXiv:2305.16867)
+    Two agents play repeated PD for N rounds with history in prompt.
+    Payoff matrix (row=you, col=opponent):
+      C/C -> (8,8); C/D -> (0,10); D/C -> (10,0); D/D -> (5,5)
+    Agent A uses LLM; Agent B can be rule-based (AC/AD/TFT) or LLM.
+    Output events: round_action, round_payoff, run_summary.
+  args_input_output: |
+    --rounds (default 20), --opponent {ac,ad,tft,llm}, --api_model, --seed
+
+base_folder: ipd_model
+skip_simulation_check: true
+only_ensure_executable: true

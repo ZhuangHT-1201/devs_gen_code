@@ -21,9 +21,12 @@ def load_trace(trace_path: Path) -> pd.DataFrame:
     text = _read_text_auto_encoding(trace_path)
     for line in text.splitlines():
         line = line.strip()
-        if not line:
+        if not line or not line.startswith("{"):
             continue
-        obj = json.loads(line)
+        try:
+            obj = json.loads(line)
+        except json.JSONDecodeError:
+            continue
         data = obj.get("data", {})
         event = obj.get("event")
 

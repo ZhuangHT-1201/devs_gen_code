@@ -1,0 +1,105 @@
+root_model_name: CompeteAI_D1
+requirements:
+  general: |
+    ### General Implementation Requirements
+    1. Language & Environment:
+    - Target Language: Python 3.10+
+    - Standard Libraries: `argparse`, `sys`, `json`, `logging`, `random`, `asyncio`, `xdevs`.
+    - LLM SDK: `from openai import AsyncOpenAI`
+    - The generated simulator MUST be executable via `python run.py`.
+
+    2. Input Interface (Arguments):
+    - Use argparse for simulation settings.
+    - Recommended args: `--num_restaurants`, `--num_customers`, `--num_rounds`, `--seed`, `--simulate_time`, `--api_model`.
+
+    3. Output Interface:
+    - stdout MUST emit JSONL event traces only.
+    - Each JSON object MUST include at least:
+      `{"time": <float>, "model": <str>, "event": <str>, "data": <dict>}`.
+    - All diagnostic logs go to stderr.
+
+    4. Time Unit:
+    - One simulation step is one competition round (one day).
+    - The coupled model advances round-by-round.
+
+  scenario: |
+    ### Scenario: CompeteAI Mini Restaurant Competition (DEVS smoke benchmark)
+
+    Paper reference: CompeteAI (ICML 2024) — restaurant agents compete for customers in a virtual town.
+    This is a **scaled-down** DEVS reproduction for pipeline validation: 2 restaurants, few customers, few rounds.
+
+    #### Entities (DEVS Models)
+    - RestaurantAgent (Atomic, x num_restaurants): LLM-driven restaurant owner. Each round sets strategy.
+    - CustomerAgent (Atomic, x num_customers): LLM-driven customer. Each round picks a restaurant.
+    - CompetitionMarket (Atomic): Deterministic aggregator. Computes visits, revenue, market share.
+    - CompeteAI_D1 (Coupled): Top-level model wiring all agents and the market for sequential rounds.
+
+    #### Simulation Flow (each round)
+    1. **Strategy phase**: Each RestaurantAgent calls LLM once → outputs strategy JSON.
+    2. **Choice phase**: Each CustomerAgent calls LLM once, seeing all restaurant strategies → outputs choice JSON.
+       - Customer LLM calls within a round MAY be dispatched concurrently (asyncio.gather).
+    3. **Settlement phase** (CompetitionMarket, deterministic):
+       - Count visits per restaurant.
+       - Revenue increment per restaurant: `visits * price_level * base_ticket` (base_ticket default 10.0).
+       - Market share: `visits_i / total_visits`.
+       - Update rolling reputation: exponential moving average of customer satisfaction per restaurant.
+    4. Emit `round_snapshot` with macro KPIs for the round.
+
+    #### Hard Rules (deterministic, NOT LLM)
+    - price_level must be clamped to integer in [1, 3].
+    - satisfaction must be clamped to [1.0, 5.0].
+    - restaurant_id must be valid; invalid choices assign to restaurant 0 with penalty.
+    - If total_visits == 0, market shares are equal split.
+    - Reputation update: `rep_i = 0.7 * rep_i + 0.3 * avg_satisfaction_i_this_round`.
+
+    #### LLM Decision Prompts
+
+    **RestaurantAgent** (each round, once per restaurant):
+    - Role: restaurant owner competing for customers.
+    - Input state: restaurant_id, name, current reputation, last round market_share, cumulative revenue,
+      competitor summary (id, reputation, last market_share).
+    - Output JSON ONLY:
+      `{"focus": "<short cuisine/strategy theme>", "price_level": <int 1-3>, "promotion": "<one sentence pitch>"}`
+
+    **CustomerAgent** (each round, once per customer):
+    - Role: customer choosing where to dine.
+    - Input state: customer_id, budget_level (low/medium/high), taste preference text,
+      list of restaurants with {id, focus, price_level, promotion, reputation, last_market_share}.
+    - Output JSON ONLY:
+      `{"restaurant_id": <int>, "satisfaction": <float 1-5>}`
+
+    #### Mandatory LLM API Coding Requirements
+    - RestaurantAgent and CustomerAgent atomic code MUST include:
+      - `import asyncio`
+      - `from openai import AsyncOpenAI`
+    - Use async API with structured JSON output:
+      `await client.chat.completions.create(..., response_format={"type":"json_object"})`
+    - Read API key from env: `OPENAI_API_KEY` or `OPENROUTER_API_KEY`.
+    - Read base URL from env: `OPENAI_BASE_URL` or `OPENROUTER_API_BASE` (default OpenRouter if key starts with sk-or-).
+    - Default api_model: `openai/gpt-4o-mini` (OpenRouter model id).
+
+    #### Coupling Requirements
+    - ALL restaurant and customer agents must be instantiated and connected (not just the first one).
+    - CompeteAI_D1 coupled model orchestrates round loop and passes market state between rounds.
+
+  args_input_output: |
+    ### Command Line Arguments
+    - `--num_restaurants` (int): number of competing restaurants. Default 2.
+    - `--num_customers` (int): number of customer agents. Default 5.
+    - `--num_rounds` (int): competition rounds (days). Default 6.
+    - `--seed` (int): random seed for tie-breaking. Default 42.
+    - `--simulate_time` (float): DEVS runtime horizon. Default 6.0.
+    - `--api_model` (str): LLM model id. Default "openai/gpt-4o-mini".
+    - `--base_ticket` (float): revenue multiplier per visit. Default 10.0.
+
+    ### Output JSONL Events (minimum required)
+    - Restaurant:
+      - `{"event":"restaurant_strategy", "data":{"round":int,"restaurant_id":int,"focus":str,"price_level":int,"promotion":str}}`
+    - Customer:
+      - `{"event":"customer_choice", "data":{"round":int,"customer_id":int,"restaurant_id":int,"satisfaction":float}}`
+    - Market (per round macro):
+      - `{"event":"round_snapshot", "data":{"round":int,"market_shares":{str:float},"revenues":{str:float},"reputations":{str:float},"total_visits":int}}`
+
+base_folder: competeai_model
+skip_simulation_check: false
+only_ensure_executable: false

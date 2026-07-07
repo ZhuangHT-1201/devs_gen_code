@@ -1,0 +1,15 @@
+root_model_name: BOS_D1
+requirements:
+  general: |
+    Python 3.10+, asyncio, openai.AsyncOpenAI, JSONL stdout traces.
+  scenario: |
+    ### Battle of the Sexes (Akata et al. 2023, arXiv:2305.16867)
+    Two agents coordinate on Option A or B for N rounds.
+    Payoff if choices (A,A)->(9,8), (B,B)->(8,9), mismatch->(0,0).
+    Metric: coordination rate (same choice).
+  args_input_output: |
+    --rounds, --opponent {ac,ad,tft,llm}, --api_model, --seed
+
+base_folder: bos_model
+skip_simulation_check: true
+only_ensure_executable: true

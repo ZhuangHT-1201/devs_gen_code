@@ -1,0 +1,29 @@
+﻿论文,arXiv,实验ID,模型,指标,我们的结果,论文基线,差值,复现判定,论文说明,结果路径
+Playing Repeated Games with LLMs (Akata 2023),2305.16867,bos_llm,deepseek/deepseek-chat,协调率,100.0% [base],55%,+45.0%,❌ 未复现,GPT-4 互玩，非对称收益,eval_results/benchmark_repro/deepseek_deepseek-chat/bos_llm
+Playing Repeated Games with LLMs (Akata 2023),2305.16867,bos_llm_scot,deepseek/deepseek-chat,协调率,100.0% [scot],70%,+30.0%,❌ 未复现,SCoT 互玩，协调提升,eval_results/benchmark_repro/deepseek_deepseek-chat/bos_llm_scot
+Playing Repeated Games with LLMs (Akata 2023),2305.16867,bos_vs_ac,deepseek/deepseek-chat,协调率,0.0% [base],90%,-90.0%,❌ 未复现,vs Always-J，易协调,eval_results/benchmark_repro/deepseek_deepseek-chat/bos_vs_ac
+Playing Repeated Games with LLMs (Akata 2023),2305.16867,bos_vs_alternate,deepseek/deepseek-chat,协调率,50.0% [base],30%,+20.0%,⚠️ 趋势接近,vs 交替策略，GPT-4 难协调,eval_results/benchmark_repro/deepseek_deepseek-chat/bos_vs_alternate
+CompeteAI (Zhao ICML 2024),2310.17512,competeai_2x3x4,deepseek/deepseek-chat,Matthew效应,R0:33% / R1:67%,定性,—,Pipeline验证,领先餐厅份额扩大；mini 配置,eval_results/benchmark_repro/deepseek_deepseek-chat/competeai_2x3x4
+CompeteAI (Zhao ICML 2024),2310.17512,competeai_2x5x6,deepseek/deepseek-chat,Matthew效应,R0:60% / R1:40%,定性,—,Pipeline验证,同上,eval_results/benchmark_repro/deepseek_deepseek-chat/competeai_2x5x6
+CompeteAI (Zhao ICML 2024),2310.17512,competeai_2x5x6_s99,deepseek/deepseek-chat,Matthew效应,R0:100% / R1:0%,定性,—,Pipeline验证,同上,eval_results/benchmark_repro/deepseek_deepseek-chat/competeai_2x5x6_s99
+LLMs as Simulated Economic Agents (Horton 2023),2301.07640,dictator_100,deepseek/deepseek-chat,给出比例,0.0% ($0/100),15%,-15.0%,✅ 部分复现,GPT-3 给出约15% endowment,eval_results/benchmark_repro/deepseek_deepseek-chat/dictator_100
+Playing Repeated Games with LLMs (Akata 2023),2305.16867,ipd_vs_ac,deepseek/deepseek-chat,Agent合作率,0.0% (互合作0.0%) [base],85%,-85.0%,❌ 未复现,GPT-4 vs Always-J，高合作,eval_results/benchmark_repro/deepseek_deepseek-chat/ipd_vs_ac
+Playing Repeated Games with LLMs (Akata 2023),2305.16867,ipd_vs_ad,deepseek/deepseek-chat,Agent合作率,0.0% (互合作0.0%) [base],15%,-15.0%,✅ 部分复现,GPT-4 vs Always-F，低合作(~85%背叛),eval_results/benchmark_repro/deepseek_deepseek-chat/ipd_vs_ad
+Playing Repeated Games with LLMs (Akata 2023),2305.16867,ipd_vs_defect_once,deepseek/deepseek-chat,Agent合作率,0.0% (互合作0.0%) [base],10%,-10.0%,✅ 部分复现,GPT-4 vs 背叛一次后合作，极不 forgiving,eval_results/benchmark_repro/deepseek_deepseek-chat/ipd_vs_defect_once
+Playing Repeated Games with LLMs (Akata 2023),2305.16867,ipd_vs_llm,deepseek/deepseek-chat,Agent合作率,0.0% (互合作0.0%) [base],55%,-55.0%,❌ 未复现,GPT-4 vs GPT-4,eval_results/benchmark_repro/deepseek_deepseek-chat/ipd_vs_llm
+Playing Repeated Games with LLMs (Akata 2023),2305.16867,ipd_vs_tft,deepseek/deepseek-chat,Agent合作率,0.0% (互合作0.0%) [base],70%,-70.0%,❌ 未复现,GPT-4 vs TFT，Figure 3,eval_results/benchmark_repro/deepseek_deepseek-chat/ipd_vs_tft
+Playing Repeated Games with LLMs (Akata 2023),2305.16867,ipd_vs_tft_scot,deepseek/deepseek-chat,Agent合作率,0.0% (互合作0.0%) [scot],70%,-70.0%,❌ 未复现,SCoT vs TFT，与 base 相近,eval_results/benchmark_repro/deepseek_deepseek-chat/ipd_vs_tft_scot
+Playing Repeated Games with LLMs (Akata 2023),2305.16867,bos_llm,openai/gpt-4o,协调率,80.0% [base],55%,+25.0%,⚠️ 趋势接近,GPT-4 互玩，非对称收益,eval_results/benchmark_repro/openai_gpt-4o/bos_llm
+Playing Repeated Games with LLMs (Akata 2023),2305.16867,bos_llm_scot,openai/gpt-4o,协调率,70.0% [scot],70%,+0.0%,✅ 部分复现,SCoT 互玩，协调提升,eval_results/benchmark_repro/openai_gpt-4o/bos_llm_scot
+Playing Repeated Games with LLMs (Akata 2023),2305.16867,bos_vs_ac,openai/gpt-4o,协调率,100.0% [base],90%,+10.0%,✅ 部分复现,vs Always-J，易协调,eval_results/benchmark_repro/openai_gpt-4o/bos_vs_ac
+Playing Repeated Games with LLMs (Akata 2023),2305.16867,bos_vs_alternate,openai/gpt-4o,协调率,50.0% [base],30%,+20.0%,⚠️ 趋势接近,vs 交替策略，GPT-4 难协调,eval_results/benchmark_repro/openai_gpt-4o/bos_vs_alternate
+CompeteAI (Zhao ICML 2024),2310.17512,competeai_2x3x4,openai/gpt-4o,Matthew效应,R0:100% / R1:0%,定性,—,Pipeline验证,领先餐厅份额扩大；mini 配置,eval_results/benchmark_repro/openai_gpt-4o/competeai_2x3x4
+CompeteAI (Zhao ICML 2024),2310.17512,competeai_2x5x6,openai/gpt-4o,Matthew效应,R0:100% / R1:0%,定性,—,Pipeline验证,同上,eval_results/benchmark_repro/openai_gpt-4o/competeai_2x5x6
+CompeteAI (Zhao ICML 2024),2310.17512,competeai_2x5x6_s99,openai/gpt-4o,Matthew效应,R0:100% / R1:0%,定性,—,Pipeline验证,同上,eval_results/benchmark_repro/openai_gpt-4o/competeai_2x5x6_s99
+LLMs as Simulated Economic Agents (Horton 2023),2301.07640,dictator_100,openai/gpt-4o,给出比例,50.0% ($50/100),15%,+35.0%,❌ 未复现,GPT-3 给出约15% endowment,eval_results/benchmark_repro/openai_gpt-4o/dictator_100
+Playing Repeated Games with LLMs (Akata 2023),2305.16867,ipd_vs_ac,openai/gpt-4o,Agent合作率,0.0% (互合作0.0%) [base],85%,-85.0%,❌ 未复现,GPT-4 vs Always-J，高合作,eval_results/benchmark_repro/openai_gpt-4o/ipd_vs_ac
+Playing Repeated Games with LLMs (Akata 2023),2305.16867,ipd_vs_ad,openai/gpt-4o,Agent合作率,0.0% (互合作0.0%) [base],15%,-15.0%,✅ 部分复现,GPT-4 vs Always-F，低合作(~85%背叛),eval_results/benchmark_repro/openai_gpt-4o/ipd_vs_ad
+Playing Repeated Games with LLMs (Akata 2023),2305.16867,ipd_vs_defect_once,openai/gpt-4o,Agent合作率,0.0% (互合作0.0%) [base],10%,-10.0%,✅ 部分复现,GPT-4 vs 背叛一次后合作，极不 forgiving,eval_results/benchmark_repro/openai_gpt-4o/ipd_vs_defect_once
+Playing Repeated Games with LLMs (Akata 2023),2305.16867,ipd_vs_llm,openai/gpt-4o,Agent合作率,0.0% (互合作0.0%) [base],55%,-55.0%,❌ 未复现,GPT-4 vs GPT-4,eval_results/benchmark_repro/openai_gpt-4o/ipd_vs_llm
+Playing Repeated Games with LLMs (Akata 2023),2305.16867,ipd_vs_tft,openai/gpt-4o,Agent合作率,0.0% (互合作0.0%) [base],70%,-70.0%,❌ 未复现,GPT-4 vs TFT，Figure 3,eval_results/benchmark_repro/openai_gpt-4o/ipd_vs_tft
+Playing Repeated Games with LLMs (Akata 2023),2305.16867,ipd_vs_tft_scot,openai/gpt-4o,Agent合作率,0.0% (互合作0.0%) [scot],70%,-70.0%,❌ 未复现,SCoT vs TFT，与 base 相近,eval_results/benchmark_repro/openai_gpt-4o/ipd_vs_tft_scot
